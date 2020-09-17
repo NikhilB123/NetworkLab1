@@ -2,7 +2,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 import sys, time
 
-def FakeToken(seed, refresh=30, salt=b"", info=b"fake-rsa-token"):
+def FakeToken(seed, refresh=80, salt=b"", info=b"fake-rsa-token"):
     while True:
         hkdf = HKDF(
             algorithm=hashes.SHA256(),

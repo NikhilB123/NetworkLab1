@@ -6,8 +6,7 @@ import sys
 import base64
 from itertools import product
 from string import ascii_lowercase
-def main():
-	
+def main():	
 	numArguments = len(sys.argv)
 	foundPassword = False
 	if numArguments == 2:
@@ -19,8 +18,8 @@ def main():
 			for iteration in range(1, 5):
 				for i in product(ascii_lowercase, repeat = iteration):
 					word = ''.join(i)
-					hashedPass = passwordHash(word, 'CPEtVdgaumD9', 1)
-					if hashedPass == b'v\xef\x91\xfa\xcd\xcc\x99\x7f\x96xm\xd4\xfc\xcdM\x10x\xf79>\xfe\xfd\xcb\xf8X\xaeu\x87\xb4\xce\xd2-':
+					hashedPass = passwordHash(word, passwordData[2], int(passwordData[1]))
+					if hashedPass == decodedPassword:
 						print('Password cracked: ' + word)
 						foundPassword = True
 			if not foundPassword:
