@@ -11,6 +11,8 @@ class UpdateUserForm(forms.Form):
     update_user_secrecy  = forms.IntegerField(label="Secrecy Level")
     
     def clean(self):
+
+
         # STUDENT TODO
         # This is where the "update user" form is validated.
         # The "cleaned_data" is a dictionary with the data
@@ -22,6 +24,8 @@ class UpdateUserForm(forms.Form):
         # Return a "ValidationError(<err msg>)" if something 
         # is wrong
         cleaned_data = super().clean()
+        if cleaned_data['update_user_secrecy'] > 0 and cleaned_data['update_user_token'] == "":
+            raise forms.ValidationError("Users with secrecy level over 0 need token")
         return cleaned_data
         
 class CreateNewsForm(forms.Form):
