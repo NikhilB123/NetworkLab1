@@ -6,7 +6,7 @@
 {% if "Invalid Token Code" in form.non_field_errors %}
 <p>Bad Token. Please try again</p>
 {%else%}
-<p>Your username and password didn't match. Please try again.</p>
+<p>{{form.non_field_errors}}</p>
 {% endif %}
 {% endif %}
 

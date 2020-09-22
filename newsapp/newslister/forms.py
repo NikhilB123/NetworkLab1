@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import NewsListing, UserXtraAuth
-from .models import NewsListing, UserXtraAuth
 
 class UpdateUserForm(forms.Form):
     update_user_select = forms.ModelChoiceField(
@@ -24,6 +23,9 @@ class UpdateUserForm(forms.Form):
         # Return a "ValidationError(<err msg>)" if something 
         # is wrong
         cleaned_data = super().clean()
+        user_auth = UserXtraAuth.objects.get(username=cleaned_data['update_user_select'])
+        if cleaned_data['update_user_secrecy'] < user_auth.secrecy:
+            raise forms.ValidationError('Cannot reduce user\'s secrecy level') 
         if cleaned_data['update_user_secrecy'] > 0 and cleaned_data['update_user_token'] == "":
             raise forms.ValidationError("Users with secrecy level over 0 need token")
         return cleaned_data
@@ -39,8 +41,6 @@ class CreateNewsForm(forms.Form):
     
     def clean(self):
         cleaned_data = super().clean()
-        print(self.user_secrecy)
-        print(cleaned_data['new_news_secrecy'])
         if self.user_secrecy > cleaned_data['new_news_secrecy']:
             raise forms.ValidationError("Secrecy level must be higher than user's secrecy")
         # STUDENT TODO
