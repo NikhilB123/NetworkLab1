@@ -64,12 +64,14 @@ class UpdateNewsForm(forms.Form):
     update_news_query   = forms.CharField(label="Update Query", required=False)
     update_news_sources = forms.CharField(label="Update Sources", required=False)
     update_news_secrecy = forms.IntegerField(label="Update Secrecy", required=False)
+    user_secrecy_instance = 0
     
-    def __init__(self, data, *args, **kargs):
+    def __init__(self, data, secrecy = -1, *args, **kargs):
         super().__init__(*args, **kargs)
         #
  
         self.fields['update_news_select'].queryset = data
+        self.user_secrecy_instance = secrecy
       
         # STUDENT TODO
         # you should change the "queryset" in update_news_select to be None.
@@ -84,6 +86,8 @@ class UpdateNewsForm(forms.Form):
     
     def clean(self, user_secrecy=0):
         cleaned_data = super().clean()
+        if cleaned_data["update_news_secrecy"] and cleaned_data["update_news_secrecy"] < self.user_secrecy_instance:
+            raise forms.ValidationError("Secrecy level must be higher than user's secrecy")
         if cleaned_data["update_news_secrecy"] and cleaned_data["update_news_secrecy"] < user_secrecy:
             raise forms.ValidationError("Secrecy level must be higher than user's secrecy")
 

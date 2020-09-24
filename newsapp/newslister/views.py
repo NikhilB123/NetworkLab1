@@ -37,7 +37,7 @@ class NewsApiManager:
             # 
             # the current secrecy of the viewer is in "self.secrecy"
             # the secrecy level of the query is in "q.secrecy"
-            if q.secrecy < self.secrecy:
+            if q.secrecy <= self.secrecy:
                 escaped_query = urllib.parse.quote(q.query)
                 escaped_sources = '"{}"'.format(urllib.parse.quote(q.sources.replace('"',"")))
                 all_results.append((q, escaped_query, escaped_sources))
@@ -109,10 +109,10 @@ def user_account(request):
     user_auth = UserXtraAuth.objects.get(username=request.user.username)
     if request.method == "GET":
         create_form = CreateNewsForm()
-        update_form = UpdateNewsForm(NewsListing.objects.filter(secrecy__lte= user_auth.secrecy ))
+        update_form = UpdateNewsForm(NewsListing.objects.filter(secrecy = user_auth.secrecy ))
         all_queries = NewsListing.objects.all()
         for q in all_queries:
-            if q.secrecy < user_auth.secrecy:
+            if q.secrecy == user_auth.secrecy:
                 data.append(q)
         return render(request,'news/update_news.html', {
             'create_form':create_form,
@@ -125,10 +125,9 @@ def user_account(request):
             create_form = CreateNewsForm(request.POST)
             user_auth = UserXtraAuth.objects.get(username=request.user.username)
             create_form.user_secrecy = user_auth.secrecy
+            update_form = UpdateNewsForm(NewsListing.objects.filter(secrecy= user_auth.secrecy ))
             if create_form.is_valid():
-                print("Before Clean")
                 clean_data = create_form.clean()
-                print("AFTER clean")
                 news_listing = NewsListing(
                     queryId = random_key(10),
                     query = clean_data["new_news_query"],
@@ -138,24 +137,25 @@ def user_account(request):
                 news_listing.save()
                 all_queries = NewsListing.objects.all()
                 for q in all_queries:
-                    if q.secrecy < user_auth.secrecy:
+                    if q.secrecy == user_auth.secrecy:
                         data.append(q)
                 newsmanager.update_articles()
                 create_form = CreateNewsForm()
-                update_form = UpdateNewsForm(NewsListing.objects.filter(secrecy__lte= user_auth.secrecy ))
-            else:
-                raise forms.ValidationError("Secrecy level must be higher than user's secrecy")     
+                update_form = UpdateNewsForm(data = NewsListing.objects.filter(secrecy = user_auth.secrecy ))
+
         elif "update_update" in request.POST or "update_delete" in request.POST:
             data = []
             all_queries = NewsListing.objects.all()
             for q in all_queries:
-                if q.secrecy <= user_auth.secrecy:
+                if q.secrecy == user_auth.secrecy:
                     data.append(q)
-            update_form = UpdateNewsForm(NewsListing.objects.filter(secrecy__lte= user_auth.secrecy ), request.POST)
+            update_form = UpdateNewsForm(NewsListing.objects.filter(secrecy = user_auth.secrecy ), user_auth.secrecy, request.POST)
+            create_form = CreateNewsForm()
             if update_form.is_valid():
                 clean_data = update_form.clean(user_auth.secrecy)
                 to_update = NewsListing.objects.get(queryId=clean_data["update_news_select"])
                 if "update_delete" in request.POST:
+                    print(request.POST)
                     to_update.delete()
                 else:
                     to_update.query = clean_data["update_news_query"]
@@ -166,12 +166,11 @@ def user_account(request):
                 all_queries = NewsListing.objects.all()
                 data = []
                 for q in all_queries:
-                    if q.secrecy <= user_auth.secrecy:
+                    if q.secrecy == user_auth.secrecy:
                         data.append(q)
-                print(data)
                 newsmanager.update_articles()
                 create_form = CreateNewsForm()
-                update_form = UpdateNewsForm(NewsListing.objects.filter(secrecy__lte= user_auth.secrecy ))
+                update_form = UpdateNewsForm(data = NewsListing.objects.filter(secrecy = user_auth.secrecy ))
         return render(request,'news/update_news.html', {
             'create_form':create_form,
             'update_form':update_form,

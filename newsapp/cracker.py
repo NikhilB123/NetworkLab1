@@ -30,15 +30,40 @@ def main():
 		cursor = db.cursor()
 		cursor.execute("SELECT * from auth_user")
 		passwordData = cursor.fetchall()
-		print(passwordData)
-		commonPasswords = ["superfaketesting123"]
+		commonPasswords = [
+        "123456",
+        "123456789",
+        "qwerty",
+        "password",
+        "1234567",
+        "12345678",
+        "12345",
+        "iloveyou",
+        "111111",
+        "123123",
+        "abc123",
+        "qwerty123",
+        "1q2w3e4r",
+        "admin",
+        "qwertyuiop",
+        "654321",
+        "555555",
+        "lovely",
+        "7777777",
+        "welcome",
+        "888888",
+        "princess",
+        "dragon",
+        "password1",
+        "123qwe"]
 
 		for x in commonPasswords:
 			for password in passwordData:
-				passwordData = password[1].split('$')
-				hashedPass = passwordHash(x, passwordData[2], int(passwordData[1]))
-				if hashedPass == base64.b64decode(passwordData[3]):
-					print("The password that has been cracked is " + x)	
+				user = password[4]
+				passInfo = password[1].split('$')
+				hashedPass = passwordHash(x, passInfo[2], int(passInfo[1]))
+				if hashedPass == base64.b64decode(passInfo[3]):
+					print(user + "," + x)	
 
 def passwordHash(password, passSalt, iters):
 	saltInBytes = bytes(passSalt, 'ascii')
