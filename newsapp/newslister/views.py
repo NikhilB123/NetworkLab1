@@ -155,7 +155,6 @@ def user_account(request):
                 clean_data = update_form.clean(user_auth.secrecy)
                 to_update = NewsListing.objects.get(queryId=clean_data["update_news_select"])
                 if "update_delete" in request.POST:
-                    print(request.POST)
                     to_update.delete()
                 else:
                     to_update.query = clean_data["update_news_query"]
