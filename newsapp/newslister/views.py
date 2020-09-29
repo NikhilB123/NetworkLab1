@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-# Create your views here.
+# Create youhr views here.
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.shortcuts import render, redirect
